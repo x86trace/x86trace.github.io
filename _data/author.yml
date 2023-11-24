@@ -1,0 +1,20 @@
+name: trace
+dp: https://pbs.twimg.com/media/F-0UAntWQAAmFRz?format=jpg&name=small
+description: '
+  <p style="text-align: justify;">
+    CTF Writeups & Blogs
+  </p>
+  <br/>
+  <p>
+    You can also connect with me via Discord : <i>x86trace</i>
+  </p>
+  <br/>
+  '
+email:
+contact:
+  - title: github
+    url: https://github.com/x86trace
+  - title: hackthebox
+    url: https://app.hackthebox.com/users/1711272
+  - title: tryhackme
+    url: https://tryhackme.com/p/x86trace
