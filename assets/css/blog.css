@@ -11,7 +11,7 @@
   --white-2: #a9abb3;
 }
 * {
-  font-family: inherit;
+  font-family: iosevka;
   text-decoration: none;
   margin: 0;
   padding: 0;
@@ -27,7 +27,7 @@ body {
   color-scheme: dark;
   color: var(--white-2);
   background-color: var(--gray-6);
-  font-family: "JetBrains Mono", monospace;
+  font-family: iosevka;
   line-height: 2rem;
   background-color: var(--gray-5);
 }
