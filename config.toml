@@ -1,4 +1,4 @@
-baseURL = "https://itaybel.github.io/"
+baseURL = "https://x86trace.github.io/"
 
 # Change the default theme to be use when building the site with Hugo
 theme = "LoveIt-0.2.11"
@@ -34,7 +34,7 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
 [author]
   name = "ItayB"
   email = "itaybel2121@gmail.com"
-  link = "https://itaybel.github.io/"
+  link = "https://x86trace.github.io/"
 
 # Menu config
 [menu]
