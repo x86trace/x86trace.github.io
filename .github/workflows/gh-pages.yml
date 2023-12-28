@@ -28,8 +28,8 @@ jobs:
         with:
           deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           publish_dir: ./public
-          user_name: 'shantanoo-desai-blog-bot'
-          user_email: 'shantanoo-desai-blog-bot@users.noreply.github.com'
+          user_name: 'x86trace'
+          user_email: 'raj625707@gmail.com'
           commit_message: 'Deploy: Update Blog Content'
-          external_repository: 'shantanoo-desai/shantanoo-desai.github.io'
+          external_repository: 'x86trace/x86trace.github.io'
           publish_branch: 'master'
