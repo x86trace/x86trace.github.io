@@ -27,7 +27,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-          publish_dir: ./public
+          publish_dir: ./content
           user_name: 'x86trace'
           user_email: 'raj625707@gmail.com'
           commit_message: 'Deploy: Update Blog Content'
