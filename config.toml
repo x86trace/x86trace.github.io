@@ -1,4 +1,4 @@
-baseURL = "https://shantanoo-desai.github.io/"
+baseURL = "https://x86trace.github.io/"
 # [en, zh-cn, fr, ...] determines default content language
 defaultContentLanguage = "en"
 # language code
@@ -20,7 +20,7 @@ theme = "LoveIt"
   dateFormat = "02-01-2006"
 
   [params.app]
-    title = "Shan's World"
+    title = "trace"
 
   [params.search]
     enable = false
@@ -35,8 +35,8 @@ theme = "LoveIt"
 
    [params.home.profile]
      enable = true
-     title = "Shantanoo's Corner on the Internet."
-     subtitle = "Commonly known as Shan in most parts of the World."
+     title = "trace"
+     subtitle = "doing computer stuff somewhere"
      typeit = true
      social = true
     [params.home.posts]
@@ -44,16 +44,10 @@ theme = "LoveIt"
       paginate = 10
 
 [params.social]
-  Devto = "shandesai"
-  Email = "sdes.softdev@gmail.com"
-  GitHub = "shantanoo-desai"
-  GitLab = "shantanoo-desai"
-  Googlescholar = "https://scholar.google.com/citations?user=UVdO710AAAAJ&hl=en"
-  LinkedIn = "shantanoo-desai"
-  Researchgate = "Shantanoo_Desai"
-  Stackoverflow = "4851126/shan-desai?tab=profile"
-  Goodreads = "12116444-shantanoo-desai"
-
+  GitHub = "x86trace"
+  Twitter= "x86trace"
+  HackTheBox= "x86trace"
+  TryHackMe= "x86trace"
 [params.page.code]
   copy = true
   maxShownLines = 50
