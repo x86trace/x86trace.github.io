@@ -1,36 +1,116 @@
-baseURL: www.leonnunes.dev
+baseURL: https://x86trace.github.io
+disablePathToLower: true
 languageCode: en-us
-title: Leon's Personal Void
+title: x86trace
 theme: PaperMod
+
+enableRobotsTXT: true
+buildDrafts: true
+buildFuture: false
+buildExpired: false
+
+params:
+  env: production
+
+  title: "x86trace"
+  description: "i do webapp pentests and playing web/pwn ctfs"
+  keywords: [Blog, Cybersecurity, Hacking, Programming, HackTheBox]
+  author: Me
+  
+  DateFormat: "January 2, 2006"
+
+  defaultTheme: dark
+  disableThemeToggle: false
+
+  ShowReadingTime: true
+  ShowShareButtons: true
+  ShareButtons: ["linkedin", "twitter"]
+
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowWordCount: true
+  ShowRssButtonInSectionTermList: true
+  UseHugoToc: true
+  disableSpecial1stPost: false
+  disableScrollToTop: false
+  comments: false
+  hidemeta: false
+  hideSummary: true
+  showtoc: false
+  tocopen: false
+
+  label:
+    text: "Home"
+  
+  profileMode:
+    enabled: true # needs to be explicitly set
+    subtitle: "Developer and Cybersecurity Nerd"
+    imageUrl: "https://i.imgur.com/xjaYATo.jpg"
+    imageWidth: 120
+    imageHeight: 120
+
+  socialIcons:
+    - name: twitter
+      url: "https://twitter.com/x86trace"
+    - name: github
+      url: "https://github.com/x86trace"
+    - name: hackthebox
+      url: "https://app.hackthebox.com/users/1711272"
+    - name: discord
+      url: "https://discord.com/users/922331284032868362"
+
+  cover:
+    hidden: true # hide everywhere but not in structured data
+    hiddenInList: true # hide on list pages and home
+    hiddenInSingle: false # hide on single page
+
+  # editPost:
+  #   URL: "https://github.com/daanbreur/blog/content"
+  #   Text: "Suggest Changes" # edit text
+  #   appendFilePath: true # to append file path to Edit link
+
+  fuseOpts:
+    isCaseSensitive: false
+    shouldSort: true
+    location: 0
+    distance: 1000
+    threshold: 0.4
+    minMatchCharLength: 0
+    keys: ["title", "permalink", "summary", "content"]
 
 menu:
   main:
-    - identifier: content
-      name: Blog
-      url: /posts
-    - identifier: Dev.to
-      name: Dev.to
-      url: https://dev.to/mediocreDevops
-    - identifier: Hashnode
-      name: Hashnode
-      url: https://blog.mediocredevops.com
+    - identifier: posts
+      name: Posts
+      url: /post/
+      weight: 10
+    - identifier: search
+      name: Search
+      url: /search/
+      weight: 20
+    - identifier: categories
+      name: Categories
+      url: /categories/
+      weight: 30
+    - identifier: tags
+      name: Tags
+      url: /tags/
+      weight: 40
 
-params:
-    profileMode:
-        enabled: true
-        title: "You've Successfully landed 🚀" # optional default will be site title
-        subtitle: "Tinkerer, Doesn't fit in"
-        imageUrl: "profile.png" # optional
-        imageTitle: "Profile picture" # optional
-        imageWidth: 200 # custom size
-        imageHeight: 237 # custom size
-        buttons:
-            - name: Github
-              url: "https://github.com/afro-coder"
-    socialIcons: # optional
-        - name: "Twitter"
-          url: "https://twitter.com/mediocreDevops"
-        - name: "Twitch"
-          url: "https://twitch.tv/leon_nunes"
-        - name: "Linkedin"
-          url: "https://linkedin.com/in/leon-nunes"
+# Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
+pygmentsUseClasses: true
+markup:
+  highlight:
+    noClasses: false
+    # anchorLineNos: true
+    # codeFences: true
+    # guessSyntax: true
+    lineNos: true
+    # style: monokai
+
+outputs:
+    home:
+        - HTML
+        - RSS
+        - JSON
