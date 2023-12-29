@@ -1,0 +1,90 @@
+baseURL: "https://x86trace.github.io/"
+title: x86trace
+paginate: 5
+theme: PaperMod
+
+params:
+  env: production # to enable google analytics, opengraph, twitter-cards and schema.
+  title: x86trace
+  description: "Writeups&Stuff"
+  keywords: [Blog, Writeups, Notes]
+  author: x86trace
+  DateFormat: "January 2, 2006"
+  defaultTheme: dark # dark, light
+  disableThemeToggle: true
+
+  ShowReadingTime: true
+  ShowShareButtons: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowWordCount: false
+  ShowRssButtonInSectionTermList: false
+  UseHugoToc: true
+  disableSpecial1stPost: false
+  disableScrollToTop: false
+  comments: false
+  hidemeta: false
+  hideSummary: true
+  showtoc: false
+  tocopen: false
+
+  label:
+    text: "trace"
+    icon: "https://i.imgur.com/xjaYATo.jpg"
+    iconHeight: 25
+
+  # profile-mode
+  profileMode:
+    enabled: true # needs to be explicitly set
+    title: trace
+    subtitle: "i do webapp pentests and play web/pwn ctfs"
+    imageUrl: "https://i.imgur.com/xjaYATo.jpg"
+    imageWidth: 130
+    imageHeight: 130
+   # imageTitle: dp
+
+  socialIcons:
+    - name: twitter
+      url: "https://twitter.com/x86trace"
+    - name: github
+      url: "https://github.com/x86trace"
+    - name: hackthebox
+      url: "https://app.hackthebox.com/users/1711272"
+    - name: discord
+      url: "https://discord.com/users/922331284032868362"
+
+  cover:
+    hidden: true # hide everywhere but not in structured data
+    hiddenInList: true # hide on list pages and home
+    hiddenInSingle: true # hide on single page
+
+menu:
+  main:
+    - identifier: home
+      name: Home
+      url: /
+      weight: 1
+    - identifier: blogs
+      name: Writeups
+      url: /writeups/
+      weight: 3
+    - identifier: tags
+      name: Tags
+      url: /tags/
+      weight: 5
+    - identifier: search
+      name: Search
+      url: /search/
+      weight: 6
+
+pygmentsUseClasses: true
+markup:
+  highlight:
+    noClasses: false
+
+outputs:
+    home:
+        - HTML
+        - RSS
+        - JSON # is necessary
