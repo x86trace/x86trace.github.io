@@ -1,0 +1,193 @@
+---
+title: CTF-200-02 (OffSec. Proving Grounds)
+image: /assets/writeups/trace6.jpg
+description: Write-up of CTF-200-01 Machine
+date: 2023-12-26 09:00:00 -3000
+categories: [proving grounds]
+tags: [AV, find, suid, linux]
+author: trace
+
+---
+
+## Enumeration:
+
+```bash
+nmap -sC -sV <IP>
+```
+
+And I Found Port 22 and 80 open
+
+#### Port 80
+
+Upon visiting port 80 i came across this `mzee-av` stuff, googling about this, I didn't find anything on the internet.
+
+![](../../assets/writeups/2023-12-26-CTF-200-02/port80.png)
+
+```bash
+=====================================================
+Gobuster v2.0.1              OJ Reeves (@TheColonial)
+=====================================================
+[+] Mode         : dir
+[+] Url/Domain   : http://192.168.209.33/
+[+] Threads      : 10
+[+] Wordlist     : /usr/share/wordlists/common.txt
+[+] Status codes : 200,204,301,302,307,403
+[+] Timeout      : 10s
+=====================================================
+2023/12/26 18:54:40 Starting gobuster
+=====================================================
+/.hta (Status: 403)
+/.htpasswd (Status: 403)
+/.htaccess (Status: 403)
+/backups (Status: 301)
+/index.html (Status: 200)
+/server-status (Status: 403)
+/upload (Status: 301)
+=====================================================
+2023/12/26 18:56:20 Finished
+=====================================================
+```
+
+Running Gobuster reveals a directory by the name of `/backups` 
+
+Visiting `/backups` we find **Backup.zip**
+
+Once Downloaded we unzip it and find
+
+```bash
+unzip backup.zip 
+Archive:  backup.zip
+   creating: var/www/html/
+   creating: var/www/html/upload/
+  inflating: var/www/html/upload/wget.exe  
+  inflating: var/www/html/upload/whoami.exe  
+ extracting: var/www/html/upload/index.html  
+  inflating: var/www/html/listing.php  
+  inflating: var/www/html/upload.php  
+  inflating: var/www/html/index.html  
+```
+
+So now it's time to review the code and find how this "AV" works :')
+
+#### Understanding the upload.php
+
+```php
+<?php
+
+/* Get the name of the uploaded file */
+$filename = $_FILES['file']['name'];
+
+/* Choose where to save the uploaded file */
+$tmp_location = "upload/file.tmp";
+$location = "upload/".$filename;
+
+
+/* Move the file temporary */
+move_uploaded_file($_FILES['file']['tmp_name'], $tmp_location);
+
+
+
+/* Check MagicBytes MZ PEFILE 4D5A*/
+$F=fopen($tmp_location,"r");
+$magic=fread($F,2);
+fclose($F);
+$magicbytes = strtoupper(substr(bin2hex($magic),0,4)); 
+error_log(print_r("Magicbytes:" . $magicbytes, TRUE));
+
+/* if its not a PEFILE block it - str_contains onlz php 8*/
+//if ( ! (str_contains($magicbytes, '4D5A'))) {
+if ( strpos($magicbytes, '4D5A') === false ) {
+    echo "Error no valid PEFILE\n";
+    error_log(print_r("No valid PEFILE", TRUE));
+    error_log(print_r("MagicBytes:" . $magicbytes, TRUE));
+    exit ();
+}
+
+rename($tmp_location, $location);
+
+
+
+?>
+```
+
+> **Breakdown**:
+
+**. Getting File Information:**
+
+- **`$filename = $_FILES['file']['name'];`:** Assigns the name of the uploaded file to the variable `$filename`.
+- **`$tmp_location = "upload/file.tmp";`:** Sets a temporary location to store the uploaded file.
+- **`$location = "upload/".$filename;`:** Specifies the final destination for the file within the "upload" directory.
+
+**2. Moving the File Temporarily:**
+
+- **`move_uploaded_file($_FILES['file']['tmp_name'], $tmp_location);`:** Moves the uploaded file from its temporary server location to the specified `$tmp_location`.
+
+**3. Checking for PE File Signature:**
+
+- **`fopen($tmp_location, "r");`:** Opens the temporary file in read mode.
+- **`$magic = fread($F, 2);`:** Reads the first two bytes of the file, which often contain a file signature.
+- **`fclose($F);`:** Closes the file.
+- **`$magicbytes = strtoupper(substr(bin2hex($magic), 0, 4));`:** Converts the first two bytes to hexadecimal format, uppercases them, and truncates them to 4 characters. This is used to check for the signature "4D5A", which indicates a PE file (Portable Executable) on Windows systems.
+
+**4. Validating the PE File Signature:**
+
+- **`if (strpos($magicbytes, '4D5A') === false) { ... }`:** Checks if the `$magicbytes` do not contain the "4D5A" signature.
+  - If the signature is not found:
+    - Prints an error message.
+    - Logs error messages for debugging.
+    - Terminates the script using `exit()`.
+
+**5. Moving the File to Final Destination:**
+
+- **`rename($tmp_location, $location);`:** Renames the temporary file to its final name in the specified `$location` directory, effectively moving it to its permanent location.
+
+**In summary, this code handles a file upload, validates if it's a PE file (commonly used for Windows executables), and moves it to a designated location if it passes the validation.**
+
+## Getting User:
+
+So, now we know where the file gets uploaded, what checks are done now it's time to get a shell via file upload (.php shell)
+
+Uploading .php reverse shell and i intercept the web request
+
+![](../../assets/writeups/2023-12-26-CTF-200-02/addingmagicbytes.png)
+
+as you can see we get the file uploaded successfully
+
+![](../../assets/writeups/2023-12-26-CTF-200-02/fileuploadedsucsessful.png)
+
+and once we visit `/upload/rev.php` we get the shell.
+
+![](../../assets/writeups/2023-12-26-CTF-200-02/gotrevshell.png)
+
+## PrivEsc:
+
+Running LinPEAS gave me this strange SUID at `/opt` named as *fileS*
+
+![](../../assets/writeups/2023-12-26-CTF-200-02/foundaninterestingbinary.png)
+
+Checking the file via `ls -al`, we can only execute the file. Trying to execute the file, it just recursive list all file in current directory
+
+```bash
+www-data@mzeeav:/opt$ ./fileS /root
+/root
+/root/proof.txt
+/root/email2.txt
+/root/.bashrc
+/root/.local
+/root/.local/share
+/root/.local/share/nano
+/root/.bash_history
+/root/.profile
+```
+
+there wasn't really a way to find how the binary works until i reverse the binary but i highly doubt that's the approach so i just tried the basic stuff which is running
+
+```bash
+./fileS --version
+```
+
+![](../../assets/writeups/2023-12-26-CTF-200-02/itsFINDBINARY.png)
+
+and i found that it's nothing but the `find` binary, so just a quick visit to [gtfo](https://gtfobins.github.io/gtfobins/find/#suid)
+
+![](../../assets/writeups/2023-12-26-CTF-200-02/rooted.png)
