@@ -45,7 +45,7 @@ params:
   
   profileMode:
     enabled: true # needs to be explicitly set
-    subtitle: "Developer and Cybersecurity Nerd"
+    subtitle: "i do webapp pentests and playing web/pwn ctfs"
     imageUrl: "https://i.imgur.com/xjaYATo.jpg"
     imageWidth: 120
     imageHeight: 120
@@ -57,6 +57,8 @@ params:
       url: "https://github.com/x86trace"
     - name: hackthebox
       url: "https://app.hackthebox.com/users/1711272"
+    - name: tryhackme
+      url: "https://tryhackme.com/x86trace"
     - name: discord
       url: "https://discord.com/users/922331284032868362"
 
