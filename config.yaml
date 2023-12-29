@@ -85,11 +85,11 @@ menu:
   main:
     - identifier: posts
       name: Posts
-      url: /posts/
+      url: posts/
       weight: 10
     - identifier: categories
       name: Categories
-      url: /categories/
+      url: categories/
       weight: 30
 
 # Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
