@@ -2,7 +2,7 @@
 title: Dreaming (THM)
 image: /assets/writeups/damn.jpeg
 description: Write-up of Dreaming Machine 
-date: 2023-11-24 09:00:00 -3000
+date: 2023-11-24
 categories: [tryhackme]
 tags: [tryhackme, thm, writeup, easy, machine, linux, code-injection, path-manipulation]
 author: trace

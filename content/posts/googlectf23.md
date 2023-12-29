@@ -2,7 +2,7 @@
 title: GoogleCTF23
 image: assets/writeups/trace3.jpeg
 description: Writeups for challenges i solved in googlectf23 
-date: 2023-06-23 16:30:00 -3000
+date: 2023-06-23
 categories: [CTFwriteups]
 tags: [crypto, pwn, web]
 author: trace

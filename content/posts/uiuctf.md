@@ -2,7 +2,7 @@
 title: UIUCTF23
 image: assets/writeups/deathwolf.jpeg
 description: Writeups for challenges i solved in UIUctf23 
-date: 2023-07-04 16:30:00 -3000
+date: 2023-07-04
 categories: [CTFwriteups]
 tags: [pwn, vimjail]
 author: trace

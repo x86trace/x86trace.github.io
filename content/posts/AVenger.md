@@ -2,7 +2,7 @@
 title: AVenger (THM)
 image: assets/writeups/trace1.jpeg
 description: Write-up of AVenger Machine 
-date: 2023-11-26 09:00:00 -3000
+date: 2023-11-26
 categories: [tryhackme]
 tags: [tryhackme, thm, writeup, medium, machine, windows, fileupload, privesc ]
 author: trace

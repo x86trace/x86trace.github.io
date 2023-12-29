@@ -2,7 +2,7 @@
 title: PC (HTB) / Easy
 image: /assets/writeups/ANIME _ JUJUTSU KAISEN.jpeg
 description: Write-up of PC Machine (HackTheBox * Hacker's Wrath) 
-date: 2023-06-02 16:30:00 -3000
+date: 2023-06-02 
 categories: [hackthebox]
 tags: [hackthebox, htb, writeup, easy, machine, linux, sql-injection, grpc, suid]
 author: trace

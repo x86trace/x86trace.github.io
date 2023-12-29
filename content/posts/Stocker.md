@@ -2,7 +2,7 @@
 title: Stocker (HTB) / Easy
 image: /assets/writeups/Makima.jpeg
 description: Write-up of Stocker Machine (HackTheBox) 
-date: 2023-06-19 14:30:00 -3000
+date: 2023-06-19
 categories: [hackthebox]
 tags: [hackthebox, htb, writeup, easy, machine, linux, nosqli, mongodb, expressjs, node, sudo]
 author: trace

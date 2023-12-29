@@ -2,7 +2,7 @@
 title: IWCON23 CTF
 image: assets/writeups/trace4.jpeg
 description: Writeup for challenge IWCON 2023 API solved in IWCON 2023 
-date: 2023-12-14 16:30:00 -3000
+date: 2023-12-14
 categories: [CTFwriteups]
 tags: [API, web]
 author: trace

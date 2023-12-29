@@ -2,7 +2,7 @@
 title: Linux Stack Based Buffer Overflow x86
 image: assets/writeups/WALLPAPER Denji_Pochita from _Chainsaw Man_.jpeg
 description: Exploit Development For linux 
-date: 2023-11-10 16:30:00 -3000
+date: 2023-11-10 
 categories: [blog]
 tags: [exploit development, linux]
 author: trace
