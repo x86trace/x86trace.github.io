@@ -1,7 +1,7 @@
 baseURL = "https://x86trace.github.io/"
 title   = "x86trace"
 languageCode = "en-us"
-theme = "hello-friend-ng"
+theme = "PaperMod"
 
 paginate  = 10
 rssLimit  = 0  # Maximum number of items in the RSS feed.
