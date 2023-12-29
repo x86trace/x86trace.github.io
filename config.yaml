@@ -1,5 +1,5 @@
-baseURL = "https://shubakki.github.io/"
-title   = "shubakki"
+baseURL = "https://x86trace.github.io/"
+title   = "x86trace"
 languageCode = "en-us"
 theme = "hello-friend-ng"
 
@@ -7,7 +7,7 @@ paginate  = 10
 rssLimit  = 0  # Maximum number of items in the RSS feed.
 copyright = "CC Attribution-NonCommercial 4.0 International License" # This message is only used by the RSS template.
 
-googleAnalytics = "UA-176711986-1"
+# googleAnalytics = "UA-176711986-1"
 
 archetypeDir = "archetypes"
 contentDir   = "content"
@@ -33,7 +33,7 @@ disableHugoGeneratorInject = false
   posts = "/posts/:year/:month/:title/"
 
 [author]
-  name = "shubakki"
+  name = "x86trace"
 
 [blackfriday]
   hrefTargetBlank = true
@@ -52,7 +52,7 @@ disableHugoGeneratorInject = false
   # Metadata mostly used in document's head
   description = ""
   keywords = ""
-  images = ["img/shubakki.jpg"]
+  images = ["https://i.imgur.com/xjaYATo.jpg"]
 
   homeSubtitle = "Noob"
   
