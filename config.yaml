@@ -1,0 +1,110 @@
+baseURL: https://x86trace.github.io/
+disablePathToLower: true
+languageCode: en-us
+title: x86trace
+theme: PaperMod
+
+enableRobotsTXT: true
+buildDrafts: true
+buildFuture: false
+buildExpired: false
+
+params:
+  env: production
+
+  title: "trace"
+  description: "i do webapp pentests and sometimes play web/pwn ctfs"
+  keywords: [Blog, Cybersecurity, Hacking, Programming, HackTheBox]
+  author: Me
+  
+  DateFormat: "January 2, 2006"
+
+  defaultTheme: dark
+  disableThemeToggle: false
+
+  ShowReadingTime: true
+  ShowShareButtons: true
+  ShareButtons: ["linkedin", "twitter"]
+
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowWordCount: true
+  ShowRssButtonInSectionTermList: true
+  UseHugoToc: true
+  disableSpecial1stPost: false
+  disableScrollToTop: false
+  comments: false
+  hidemeta: false
+  hideSummary: true
+  showtoc: false
+  tocopen: false
+
+  label:
+    text: "x86trace"
+  
+  profileMode:
+    enabled: true # needs to be explicitly set
+    subtitle: "i do webapp pentests and playing web/pwn ctfs"
+    imageUrl: "https://i.imgur.com/xjaYATo.jpg"
+    imageWidth: 120
+    imageHeight: 120
+
+  socialIcons:
+    - name: twitter
+      url: "https://twitter.com/x86trace"
+    - name: github
+      url: "https://github.com/x86trace"
+    - name: hackthebox
+      url: "https://app.hackthebox.com/users/1711272"
+    - name: tryhackme
+      url: "https://tryhackme.com/x86trace"
+    - name: discord
+      url: "https://discord.com/users/922331284032868362"
+
+  cover:
+    hidden: true # hide everywhere but not in structured data
+    hiddenInList: true # hide on list pages and home
+    hiddenInSingle: false # hide on single page
+
+  # editPost:
+  #   URL: "https://github.com/daanbreur/blog/content"
+  #   Text: "Suggest Changes" # edit text
+  #   appendFilePath: true # to append file path to Edit link
+
+  fuseOpts:
+    isCaseSensitive: false
+    shouldSort: true
+    location: 0
+    distance: 1000
+    threshold: 0.4
+    minMatchCharLength: 0
+    keys: ["title", "permalink", "summary", "content"]
+
+menu:
+  main:
+    - identifier: posts
+      name: Posts
+      url: posts/
+      weight: 10
+    - identifier: categories
+      name: Categories
+      url: categories/
+      weight: 30
+
+# Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
+pygmentsUseClasses: true
+markup:
+  highlight:
+    noClasses: false
+    # anchorLineNos: true
+    # codeFences: true
+    # guessSyntax: true
+    lineNos: true
+    # style: monokai
+
+outputs:
+    home:
+        - HTML
+        - RSS
+        - JSON
