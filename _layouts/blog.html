@@ -12,8 +12,9 @@
           {% endif %}
           <div class="article-content">
             <h2 class="article-title">
-              <small class="date">{{ post.date | date("YYYY-MM-DD") }}</small>
+              <a href="{{site.baseurl}}{{post.url}}"> {{post.title}} </a>
             </h2>
+            <small class="date">{{post.date | date_to_string}}</small>
             <div class="categories">
               {% for c in post.categories %}
               <a href="#!" data-base-url="{{site.baseurl}}" class="category"
