@@ -13,7 +13,7 @@ params:
   env: production
 
   title: "trace"
-  description: "i do webapp pentests and playing web/pwn ctfs"
+  description: "i do webapp pentests and sometimes play web/pwn ctfs"
   keywords: [Blog, Cybersecurity, Hacking, Programming, HackTheBox]
   author: Me
   
