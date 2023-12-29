@@ -83,7 +83,7 @@ menu:
   main:
     - identifier: posts
       name: Posts
-      url: /post/
+      url: /posts/
       weight: 10
     - identifier: search
       name: Search
