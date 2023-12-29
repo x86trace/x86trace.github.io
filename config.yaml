@@ -1,4 +1,4 @@
-baseURL: https://x86trace.github.io
+baseURL: https://x86trace.github.io/
 disablePathToLower: true
 languageCode: en-us
 title: x86trace
