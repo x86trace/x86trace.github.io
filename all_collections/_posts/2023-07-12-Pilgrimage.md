@@ -1,7 +1,7 @@
 ---
 title: Pilgrimage (HTB) / Easy
 description: Write-up of Pilgrimage Machine (HackTheBox) 
-date: 2023-07-12 14:30:00 -3000
+date: 2023-07-12 
 categories: [hackthebox]
 tags: [hackthebox, htb, writeup, easy, git, imagemagick, binwalk, CVE-2022-4510, CVE-2022-44268]
 author: trace

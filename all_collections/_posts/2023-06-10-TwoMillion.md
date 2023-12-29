@@ -1,7 +1,7 @@
 ---
 title: TwoMillion (HTB) / Easy
 description: Write-up of TwoMillion Machine (HackTheBox) 
-date: 2023-06-10 18:30:00 -3000
+date: 2023-06-10 
 categories: [hackthebox]
 tags: [hackthebox, htb, writeup, easy, machine, linux, kernel, api, js-desobfuscation]
 author: trace

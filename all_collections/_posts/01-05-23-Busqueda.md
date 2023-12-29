@@ -1,7 +1,7 @@
 ---
 title: Busqueda (HTB) / Easy
 description: Write-up of Busqueda Machine (Hackthebox * Hacker's Wrath) 
-date: 2023-05-01 09:00:00 -3000
+date: 2023-05-01 
 categories: [hackthebox]
 tags: [hackthebox, htb, writeup, easy, machine, linux, code-injection, path-manipulation]
 author: trace
