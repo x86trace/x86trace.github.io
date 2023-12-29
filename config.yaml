@@ -1,110 +1,121 @@
-baseURL: https://x86trace.github.io/
-disablePathToLower: true
-languageCode: en-us
-title: x86trace
-theme: PaperMod
+baseURL = "https://shubakki.github.io/"
+title   = "shubakki"
+languageCode = "en-us"
+theme = "hello-friend-ng"
 
-enableRobotsTXT: true
-buildDrafts: true
-buildFuture: false
-buildExpired: false
+paginate  = 10
+rssLimit  = 0  # Maximum number of items in the RSS feed.
+copyright = "CC Attribution-NonCommercial 4.0 International License" # This message is only used by the RSS template.
 
-params:
-  env: production
+googleAnalytics = "UA-176711986-1"
 
-  title: "trace"
-  description: "i do webapp pentests and sometimes play web/pwn ctfs"
-  keywords: [Blog, Cybersecurity, Hacking, Programming, HackTheBox]
-  author: Me
+archetypeDir = "archetypes"
+contentDir   = "content"
+dataDir      = "data"
+layoutDir    = "layouts"
+publishDir   = "public"
+
+buildDrafts  = false
+buildFuture  = false
+buildExpired = false
+canonifyURLs = true
+
+enableRobotsTXT = false
+enableGitInfo   = false
+enableEmoji     = true
+enableMissingTranslationPlaceholders = false
+disableRSS     = false
+disableSitemap = false
+disable404     = false
+disableHugoGeneratorInject = false
+
+[permalinks]
+  posts = "/posts/:year/:month/:title/"
+
+[author]
+  name = "shubakki"
+
+[blackfriday]
+  hrefTargetBlank = true
+
+[taxonomies]
+  tag      = "tags"
+  category = "categories"
+  #series   = "series"
+
+[params]
+  dateform        = "Jan 2, 2006"
+  dateformShort   = "Jan 2"
+  dateformNum     = "2006-01-02"
+  dateformNumTime = "2006-01-02 15:04 -0700"
+
+  # Metadata mostly used in document's head
+  description = ""
+  keywords = ""
+  images = ["img/shubakki.jpg"]
+
+  homeSubtitle = "Noob"
   
-  DateFormat: "January 2, 2006"
+  # Set disableReadOtherPosts to true in order to hide the links to other posts.
+  disableReadOtherPosts = false
 
-  defaultTheme: dark
-  disableThemeToggle: false
+  # Integrate Javascript files or stylesheets by adding the url to the external assets or by
+  # linking local files with their path relative to the static folder, e.g. "css/styles.css"
+  customCSS = []
+  customJS  = []
 
-  ShowReadingTime: true
-  ShowShareButtons: true
-  ShareButtons: ["linkedin", "twitter"]
+  # Toggle this option need to rebuild SCSS, requires extended version of Hugo
+  justifyContent = true  # Set "text-align: justify" to .content.
 
-  ShowPostNavLinks: true
-  ShowBreadCrumbs: true
-  ShowCodeCopyButtons: true
-  ShowWordCount: true
-  ShowRssButtonInSectionTermList: true
-  UseHugoToc: true
-  disableSpecial1stPost: false
-  disableScrollToTop: false
-  comments: false
-  hidemeta: false
-  hideSummary: true
-  showtoc: false
-  tocopen: false
+  # Default theme "light" or "dark"
+  defaultTheme = "dark"
+  themeColor = "#0c0c0d"
 
-  label:
-    text: "x86trace"
-  
-  profileMode:
-    enabled: true # needs to be explicitly set
-    subtitle: "i do webapp pentests and playing web/pwn ctfs"
-    imageUrl: "https://i.imgur.com/xjaYATo.jpg"
-    imageWidth: 120
-    imageHeight: 120
+  # Colors for favicons
+  [params.favicon.color]
+    mask = "#0c0c0d"
+    msapplication = "#0c0c0d"
 
-  socialIcons:
-    - name: twitter
-      url: "https://twitter.com/x86trace"
-    - name: github
-      url: "https://github.com/x86trace"
-    - name: hackthebox
-      url: "https://app.hackthebox.com/users/1711272"
-    - name: tryhackme
-      url: "https://tryhackme.com/x86trace"
-    - name: discord
-      url: "https://discord.com/users/922331284032868362"
+  [params.logo]
+    logoText     = "# echo '🦐 shrimple maldev 🦐'"
+    logoHomeLink = "/"
+    # Set true to remove the logo cursor entirely.
+    # logoCursorDisabled = false
+    # Set to a valid CSS color to change the cursor in the logo.
+    logoCursorColor    = "#7B2CBF"
+    # Set to a valid CSS time value to change the animation duration, "0s" to disable.
+    # logoCursorAnimate  = "2s"
 
-  cover:
-    hidden: true # hide everywhere but not in structured data
-    hiddenInList: true # hide on list pages and home
-    hiddenInSingle: false # hide on single page
+  [params.portrait]
+    path = "img/shubakki.jpg"
+    alt = "where portrait"
 
-  # editPost:
-  #   URL: "https://github.com/daanbreur/blog/content"
-  #   Text: "Suggest Changes" # edit text
-  #   appendFilePath: true # to append file path to Edit link
+  # Social icons
+  [[params.social]]
+    name = "github"
+    url  = "https://github.com/shubakki"
 
-  fuseOpts:
-    isCaseSensitive: false
-    shouldSort: true
-    location: 0
-    distance: 1000
-    threshold: 0.4
-    minMatchCharLength: 0
-    keys: ["title", "permalink", "summary", "content"]
+  [[params.social]]
+    name = "hackthebox"
+    url  =  "https://app.hackthebox.com/profile/504214"
 
-menu:
-  main:
-    - identifier: posts
-      name: Posts
-      url: /posts
-      weight: 10
-    - identifier: categories
-      name: Categories
-      url: /categories
-      weight: 30
-
-# Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
-pygmentsUseClasses: true
-markup:
-  highlight:
-    noClasses: false
-    # anchorLineNos: true
-    # codeFences: true
-    # guessSyntax: true
-    lineNos: true
-    # style: monokai
-
-outputs:
-    home:
-        - HTML
-        - RSS
-        - JSON
+  [[params.social]]
+    name = "discord"
+    url  =  "https://discord.com/users/860207764910505985"
+    
+  [[params.social]]
+    name = "twitter"
+    url = "https://twitter.com/shubakki"
+[menu]
+  [[menu.main]]
+    identifier = "about"
+    name       = "About Me"
+    url        = "about/"
+  [[menu.main]]
+    identifier = "posts"
+    name       = "Posts"
+    url        = "posts/"
+  [[menu.main]]
+    identifier = "categories"
+    name       = "Categories"
+    url        = "categories/"
