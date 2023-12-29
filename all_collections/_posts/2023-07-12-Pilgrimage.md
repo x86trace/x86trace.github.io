@@ -1,6 +1,5 @@
 ---
 title: Pilgrimage (HTB) / Easy
-image: /assets/writeups/trace2.jpeg
 description: Write-up of Pilgrimage Machine (HackTheBox) 
 date: 2023-07-12 14:30:00 -3000
 categories: [hackthebox]

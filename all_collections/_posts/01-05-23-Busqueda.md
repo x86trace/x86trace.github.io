@@ -1,6 +1,5 @@
 ---
 title: Busqueda (HTB) / Easy
-image: /assets/writeups/6280b100e0a8fe2995c48c6446f87647.jpg
 description: Write-up of Busqueda Machine (Hackthebox * Hacker's Wrath) 
 date: 2023-05-01 09:00:00 -3000
 categories: [hackthebox]

@@ -1,6 +1,5 @@
 ---
 title: TwoMillion (HTB) / Easy
-image: /assets/writeups//Пин на доске Граффити в виде алфавита.jpeg
 description: Write-up of TwoMillion Machine (HackTheBox) 
 date: 2023-06-10 18:30:00 -3000
 categories: [hackthebox]
