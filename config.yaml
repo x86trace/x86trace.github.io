@@ -120,3 +120,5 @@ outputs:
         - HTML
         - RSS
         - JSON
+        
+ignoreErrors: ["error-remote-getjson"]
