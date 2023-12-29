@@ -7,6 +7,7 @@
       <section class="article">
         <div class="article-header">
           <h2 class="article-title">{{page.title}}</h2>
+          <small class="date">{{ post.date | date("YYYY-MM-DD") }}</small>
           <div class="categories">
             {% for c in page.categories %}
             <a href="#!" class="category">{{c}}</a>

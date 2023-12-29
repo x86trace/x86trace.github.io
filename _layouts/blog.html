@@ -12,7 +12,7 @@
           {% endif %}
           <div class="article-content">
             <h2 class="article-title">
-              <a href="{{site.baseurl}}{{post.url}}"> {{post.title}} </a>
+              <small class="date">{{ post.date | date("YYYY-MM-DD") }}</small>
             </h2>
             <div class="categories">
               {% for c in post.categories %}
