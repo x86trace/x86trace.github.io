@@ -52,7 +52,7 @@ params:
     - name: hackthebox
       url: "https://app.hackthebox.com/users/1711272"
     - name: tryhackme
-      url: "https://tryhackme.com/x86trace"
+      url: "https://tryhackme.com/p/x86trace"
     - name: discord
       url: "https://discord.com/users/922331284032868362"
 
