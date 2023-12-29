@@ -106,8 +106,6 @@ gRPC Web UI available at http://127.0.0.1:36409/
 
 Accessing the Web UI:
 
-<img src="/assets/writeups/2023-06-02-pc/grpcui.png" width=500px alt="gRPCui start screen">
-
 This machine has two services: `SimpleApp` and `grpc.reflection.v1alpha.ServerReflection`. The `ServerReflection` is used to [expose the other services publicly](https://grpc.github.io/grpc/core/md_doc_server_reflection_tutorial.html).
 
 While exploring the server, we discovered three functions within SimpleApp: one for login, one for registration, and another one to retrieve user information. Once authenticated, the user receives a token metadata attribute containing a JWT, which is used for the getInfo function.
@@ -118,7 +116,7 @@ While exploring the server, we discovered three functions within SimpleApp: one 
 | RegisterUser | `{"username":"USER", "password":"PASSWORD"}` | `False`      | "Account created for user arthur!", "User Already Exists!!" |
 | getInfo      | `{"id": "USER_ID"}`                          | `True`       | "Will update soon."                                         |
 
-<img src="/assets/writeups/2023-06-02-pc/loginUser.png" width=500px alt="Server response">
+
 
 <!--
 Calling the `getInfo` with our id as payload. we got a message:
@@ -129,7 +127,7 @@ It is possible that when we call the `getInfo` function, the returned message is
 
 Said and done, we encountered a Python error:
 
-<img src="/assets/writeups/2023-06-02-pc/SQLInjection.png" width=1200px alt="SQL Injection intercept">
+
 
 ## Exploitation
 
