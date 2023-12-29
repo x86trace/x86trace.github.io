@@ -12,7 +12,7 @@ buildExpired: false
 params:
   env: production
 
-  title: "x86trace"
+  title: "trace"
   description: "i do webapp pentests and playing web/pwn ctfs"
   keywords: [Blog, Cybersecurity, Hacking, Programming, HackTheBox]
   author: Me
@@ -41,7 +41,7 @@ params:
   tocopen: false
 
   label:
-    text: "Home"
+    text: "x86trace"
   
   profileMode:
     enabled: true # needs to be explicitly set
