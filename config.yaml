@@ -2,7 +2,7 @@ baseURL: https://x86trace.github.io
 disablePathToLower: true
 languageCode: en-us
 title: x86trace
-theme: github.com/adityatelange/hugo-PaperMod
+theme: PaperMod
 
 # googleAnalytics:
 
