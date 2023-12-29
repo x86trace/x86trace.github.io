@@ -67,15 +67,15 @@ menu:
       weight: 1
     - identifier: blogs
       name: Writeups
-      url: /writeups/
+      url: writeups
       weight: 3
     - identifier: tags
       name: Tags
-      url: /tags/
+      url: tags
       weight: 5
     - identifier: search
       name: Search
-      url: /search/
+      url: search
       weight: 6
 
 pygmentsUseClasses: true
