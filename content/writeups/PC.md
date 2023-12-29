@@ -22,7 +22,6 @@ author: trace
 
 ---
 
-
 ## Resolution Summary
 
 1. Scanning for open ports, the attacker found a service running at 50051.
@@ -34,12 +33,12 @@ author: trace
 
 ## Tools
 
-| Purpose                         | Tools                                       |
-|:--------------------------------|:--------------------------------------------|
-| Port Scanning/Service Analysis  | [`nmap`](https://nmap.org/) [`nc`](https://www.armourinfosec.com/hacking-with-netcat-a-comprehensive-guide/)|
-| gRPC Communication              | [`grpcurl`](https://github.com/fullstorydev/grpcurl) [`grpcui`](https://github.com/fullstorydev/grpcui) [`postman`](https://blog.postman.com/postman-now-supports-grpc/) [`burpsuite`](https://portswigger.net/burp/communitydownload)|
-| SQL Injection                   | [`sqlmap`](https://sqlmap.org/)|
-| SUID Exploitation               | [`GTFOBins`](https://gtfobins.github.io/)|
+| Purpose                        | Tools                                                                                                                                                                                                                                  |
+|:------------------------------ |:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Port Scanning/Service Analysis | [`nmap`](https://nmap.org/) [`nc`](https://www.armourinfosec.com/hacking-with-netcat-a-comprehensive-guide/)                                                                                                                           |
+| gRPC Communication             | [`grpcurl`](https://github.com/fullstorydev/grpcurl) [`grpcui`](https://github.com/fullstorydev/grpcui) [`postman`](https://blog.postman.com/postman-now-supports-grpc/) [`burpsuite`](https://portswigger.net/burp/communitydownload) |
+| SQL Injection                  | [`sqlmap`](https://sqlmap.org/)                                                                                                                                                                                                        |
+| SUID Exploitation              | [`GTFOBins`](https://gtfobins.github.io/)                                                                                                                                                                                              |
 
 ## Information Gathering
 
@@ -52,11 +51,11 @@ $ nmap -sS -p- -oN nmap.txt 10.10.11.214
 PORT      STATE SERVICE
 22/tcp    open  ssh
 50051/tcp open  unknown
-``` 
+```
 
 Two services: `ssh` and a... what?
 
-## Enumeration 
+## Enumeration
 
 #### unknown (50051)
 
@@ -113,12 +112,11 @@ This machine has two services: `SimpleApp` and `grpc.reflection.v1alpha.ServerRe
 
 While exploring the server, we discovered three functions within SimpleApp: one for login, one for registration, and another one to retrieve user information. Once authenticated, the user receives a token metadata attribute containing a JWT, which is used for the getInfo function.
 
-
-| Function                         | Message (Parameters)                         | JWT Required      | Message            |
-|:---------------------------------|:---------------------------------------------|:------------------|:-------------------| 
-| LoginUser                        | `{"username":"USER", "password":"PASSWORD"}` | `False`           | "Your id is 345.", "Login unsuccessful" |
-| RegisterUser                     | `{"username":"USER", "password":"PASSWORD"}` | `False`           | "Account created for user arthur!", "User Already Exists!!" |
-| getInfo                          | `{"id": "USER_ID"}`                              | `True`            | "Will update soon." |
+| Function     | Message (Parameters)                         | JWT Required | Message                                                     |
+|:------------ |:-------------------------------------------- |:------------ |:----------------------------------------------------------- |
+| LoginUser    | `{"username":"USER", "password":"PASSWORD"}` | `False`      | "Your id is 345.", "Login unsuccessful"                     |
+| RegisterUser | `{"username":"USER", "password":"PASSWORD"}` | `False`      | "Account created for user arthur!", "User Already Exists!!" |
+| getInfo      | `{"id": "USER_ID"}`                          | `True`       | "Will update soon."                                         |
 
 <img src="/assets/writeups/2023-06-02-pc/loginUser.png" width=500px alt="Server response">
 
@@ -133,7 +131,7 @@ Said and done, we encountered a Python error:
 
 <img src="/assets/writeups/2023-06-02-pc/SQLInjection.png" width=1200px alt="SQL Injection intercept">
 
-## Exploitation 
+## Exploitation
 
 To exploit this vulnerability, let's use sqlmap. 
 
@@ -153,6 +151,7 @@ Running sqlmap:
 ```bash
 sqlmap -r req.txt --risk 3 --level 5
 ```
+
 The scan detects that the database is [SQLite3](https://www.sqlite.org/index.html) and dumps it. Since it's a serverless database, we can't find any information about the system. The database consists of two tables: messages and accounts.
 
 If you want to gain a deeper understanding of injecting in SQLite3, make sure to check out [this paper](https://www.exploit-db.com/docs/41397).
@@ -185,6 +184,7 @@ Trying to login via SSH with the `sau` user, we get a shell.
 Enumerating system's information:
 
 ---
+
 - id: `uid=1001(sau) gid=1001(sau) groups=1001(sau)`
 - system: `Ubuntu 20.04.6 LTS`
 - users: `sau`, `root`.
@@ -195,7 +195,7 @@ Enumerating system's information:
 
 One of the most common privilege escalation techniques is through [SUID](https://medium.com/go-cyber/linux-privilege-escalation-with-suid-files-6119d73bc620). Let's test it out and see how it works:
 
-#### Checking for SUID binaries 
+#### Checking for SUID binaries
 
 ```bash
 $ find / -user root -perm /4000 2>/dev/null 
@@ -210,6 +210,7 @@ $ find / -user root -perm /4000 2>/dev/null
 /usr/bin/chsh
 # [...]
 ```
+
 The `bash` binary is set with the SUID bit. In simple words, this means that when executing bash, it runs with the owner's privileges, which in this case is root. To exploit this configuration, we can spawn a new shell [while maintaining the root privileges](https://gtfobins.github.io/gtfobins/bash/#suid).
 
 ```bash
