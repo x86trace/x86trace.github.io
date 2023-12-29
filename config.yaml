@@ -1,4 +1,4 @@
-baseURL: "https://x86trace.github.io/"
+baseURL: "x86trace.github.io"
 title: x86trace
 paginate: 5
 theme: PaperMod
