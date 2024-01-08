@@ -32,7 +32,7 @@ FLUSH PRIVILEGES;
 ```
 column contains the value "password," and the user in question, who has unfortunately forgotten their password, is identified as "skat."
 
-Upon examining the backend code located in ./recurso/whats-my-password/src/main.go, it becomes apparent that the provided code handles user input sanitation but overlooks the password sanitization process.
+Upon examining the backend code located in ~/Downloads/whats-my-password/src/main.go, it becomes apparent that the provided code handles user input sanitation but overlooks the password sanitization process.
 
 Here is an excerpt from the code:
 >main.go
