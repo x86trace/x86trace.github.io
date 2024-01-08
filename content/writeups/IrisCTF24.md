@@ -164,3 +164,5 @@ So, The `init()` function is executed before the `main()` function. It modifies 
 So I will just write a solve script, that Initialize an empty list `runed` to store the reversed flag. Set the initial value of `z` to 0. Iterate over each character in the original flag. Subtract the current value of `z` from the Unicode value of the character. Convert the result to a character using `chr()` and append it to the `runed` list, and then Update `z` to the Unicode value of the current character.
 
 ![enter image description here](https://i.imgur.com/i39NXnV.png)
+
+> Flag: `irisctf{i_r3411y_1ik3_num63r5}`
